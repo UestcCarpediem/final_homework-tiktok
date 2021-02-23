@@ -10,9 +10,23 @@
 
 <body>
     <h1>Socket.io Testing</h1>
+    <div>
+        <p>Current Room:<span id="room"></span></p>
+    </div>
     <ul id="events"></ul>
+    <div>
+        <label>
+            room
+            <input id='inputRoom' value="0">
+        </label>
+    </div>
+    <div>
+        <label>
+            msg
+            <input id='input'>
+        </label>
+    </div>
 
-    <input id='input'>
     <button id="btn" onclick="sendMsgStar()">SendLike</button>
     <button id="btn" onclick="sendMsgComment()">SendComment</button>
     <button id="btn" onclick="sendMsgReJoin()">SendReJoin</button>
@@ -22,21 +36,24 @@
         const $event = document.getElementById('events');
 
         const $input = document.getElementById('input');
+        const $inputRoom = document.getElementById('inputRoom');
+        const $room = document.getElementById('room');
+        const state = { id: 0 };
+        $room.innerText = state.id;
 
         const newItem = (content) => {
             const item = document.createElement('li');
-            console.log(typeof(content));
-            if(typeof content == 'object'){
+            if (typeof content == 'object') {
                 item.innerHTML = JSON.stringify(content);
-            }else{
+            } else {
                 item.innerHTML = content;
             }
             return item;
         }
 
         function startConnect() {
-            const socket = io('ws://127.0.0.1:7001/ws?token=123123');
-            // const socket = io('ws://tiktok.kingfish404.cn/ws?token=123123');
+            const socket = io('ws://127.0.0.1:7001/ws?id=0');
+            // const socket = io('ws://tiktok.kingfish404.cn/ws?id=0');
 
             socket.on('connect', () => {
                 $event.appendChild(newItem('connect'));
@@ -62,17 +79,21 @@
 
         function sendMsgStar() {
             const msg = $input.value;
-            window.socket.emit('setlike', { id: 0, type: 'live' });
+            window.socket.emit('setlike', { id: Number(state.id) });
         }
 
         function sendMsgComment() {
             const msg = $input.value;
-            window.socket.emit('setcomment', { id: 0, data: 'comment' });
+            window.socket.emit('setcomment', { id: Number(state.id), data: msg, name: 'userName' });
         }
 
         function sendMsgReJoin() {
             const msg = $input.value;
-            window.socket.emit('rejoin', { id: 1 });
+            const roomId = $inputRoom.value;
+            const roomIdOld = state.id;
+            state.id = roomId;
+            $room.innerText = roomId;
+            window.socket.emit('rejoin', { id: Number(roomId), id_old: Number(roomIdOld) });
         }
 
         startConnect();

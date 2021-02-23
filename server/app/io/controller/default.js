@@ -3,23 +3,50 @@
 
 module.exports = app => {
   class Controller extends app.Controller {
-    async rejoin() {
+    async rejoin(socket) {
+      // 切换加入房间
       const { ctx } = this;
-      const message = ctx.args;
-      console.log('rejoin', ctx.args);
-      await ctx.socket.emit('getrejoin', { id: 1, comments: {}, get: message });
+      const message = ctx.args[0];
+      if (message) {
+        const id = message.id;
+        const id_old = message.id_old;
+        console.log('rejoin', message);
+        if (id !== null) {
+          const roomId = 'room-' + String(id);
+          const roomId_old = 'room-' + String(id_old);
+          // console.log('#rejoin#room:' + roomId);
+          socket.join(roomId);
+          socket.leave(roomId_old);
+          await ctx.socket.emit('getrejoin', { id: Number(id), comments: {}, get: message });
+        }
+      }
     }
     async like() {
+      // 喜欢
       const { ctx } = this;
-      const message = ctx.args;
-      console.log('like:', ctx.args);
-      await ctx.socket.emit('getlike', { id: 0, like: 20000, get: message });
+      const message = ctx.args[0];
+      console.log('like:', message);
+      const id = message.id;
+      await ctx.socket.emit('getlike', { id: Number(id), like: 20000, get: message });
     }
     async comment() {
+      // 发布评论
       const { ctx } = this;
-      const message = ctx.args;
-      console.log('comment', ctx.args);
-      await ctx.socket.emit('getcomment', { id: 0, data: 'comment', name: 'userName' });
+      const message = ctx.args[0];
+      const comment = message.data;
+      console.log('comment', message);
+      if (message) {
+        if (message.id !== null) {
+          const id = message.id;
+          const roomId = 'room-' + String(id);
+          const name = message.name;
+          // console.log('#comment#room:' + roomId);
+          await ctx.socket.to(roomId).emit('getcomment', { id: Number(id), data: comment, name: String(name) });
+        }
+      } else {
+        console.log('get msg failed!');
+        await ctx.socket.emit('getcomment', { id: 0, data: 'error!id is empty!', get: message });
+      }
     }
   }
   return Controller;
