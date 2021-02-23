@@ -9,7 +9,8 @@
   "dependencies": {
     "egg": "^2.29.3",
     "egg-mysql": "^3.0.0",
-    "egg-scripts": "^2.13.0"
+    "egg-scripts": "^2.13.0",
+    "egg-socket.io": "^4.1.6"
   },
   "devDependencies": {
     "autod": "^3.1.1",
@@ -24,12 +25,12 @@
     "node": ">=10.0.0"
   },
   "scripts": {
-    "start": "egg-scripts start --daemon --title=egg-server-tiktok-server",
+    "start": "egg-scripts start --daemon --title=egg-server-tiktok-server --sticky",
     "stop": "egg-scripts stop --title=egg-server-tiktok-server",
-    "dev": "egg-bin dev",
-    "debug": "egg-bin debug",
+    "dev": "egg-bin dev --sticky",
+    "debug": "egg-bin debug --sticky",
     "test": "npm run lint -- --fix && npm run test-local",
-    "test-local": "egg-bin test",
+    "test-local": "egg-bin test --sticky",
     "cov": "egg-bin cov",
     "lint": "eslint .",
     "ci": "npm run lint && npm run cov",

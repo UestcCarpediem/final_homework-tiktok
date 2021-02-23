@@ -10,5 +10,9 @@ module.exports = {
     enable: true,
     package: 'egg-mysql',
   },
+  io: {
+    enable: true,
+    package: 'egg-socket.io',
+  },
 };
 

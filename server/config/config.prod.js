@@ -23,21 +23,6 @@ module.exports = appInfo => {
     // myAppName: 'egg',
   };
 
-  // 导入socket.io
-  config.io = {
-    init: {}, // passed to engine.io
-    namespace: {
-      '/': {
-        connectionMiddleware: [ 'auth' ],
-        packetMiddleware: [ ],
-      },
-      '/ws': {
-        connectionMiddleware: [ 'auth' ],
-        packetMiddleware: [ ],
-      },
-    },
-  };
-
   return {
     ...config,
     ...userConfig,
