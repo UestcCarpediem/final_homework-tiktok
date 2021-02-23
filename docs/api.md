@@ -57,6 +57,29 @@ response:
 
 ```javascript
 url: /ws
+
+desc: 切换视频/live
+send:
+socket.emit('rejoin', { id: 1 });
+res:
+socket.emit('getrejoin', { id: 1, comments: {} });
+
+desc: 点赞
+send:
+socket.emit('setlike', { id: 0, type: 'live' });
+res:
+socket.emit('getlike', { id: 0, like: 20000 });
+
+desc: 发评论
+send:
+socket.emit('setcomment', { id: 0, data: 'comment' });
+res:
+none
+
+desc: 收评论
+res:
+socket.emit('getcomment', { id: 0, data: 'comment' , name: 'userName' });
+
 ```
 
 ## 报错

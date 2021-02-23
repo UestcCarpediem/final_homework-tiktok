@@ -13,7 +13,9 @@
     <ul id="events"></ul>
 
     <input id='input'>
-    <button id="btn" onclick="sendMsg()">Send</button>
+    <button id="btn" onclick="sendMsgStar()">SendLike</button>
+    <button id="btn" onclick="sendMsgComment()">SendComment</button>
+    <button id="btn" onclick="sendMsgReJoin()">SendReJoin</button>
 
     <script src="https://cdn.jsdelivr.net/npm/socket.io-client@2/dist/socket.io.js"></script>
     <script>
@@ -23,30 +25,54 @@
 
         const newItem = (content) => {
             const item = document.createElement('li');
-            item.innerHTML = content;
+            console.log(typeof(content));
+            if(typeof content == 'object'){
+                item.innerHTML = JSON.stringify(content);
+            }else{
+                item.innerHTML = content;
+            }
             return item;
         }
 
         function startConnect() {
-            // const socket = io('ws://127.0.0.1:7001/ws?token=123123');
-            const socket = io('ws://tiktok.kingfish404.cn/ws?token=123123');
+            const socket = io('ws://127.0.0.1:7001/ws?token=123123');
+            // const socket = io('ws://tiktok.kingfish404.cn/ws?token=123123');
 
             socket.on('connect', () => {
                 $event.appendChild(newItem('connect'));
                 socket.send('123123');
             });
 
-            socket.on('res', (res) => {
+            socket.on('getrejoin', (res) => {
                 $event.appendChild(newItem(res));
             });
+
+            socket.on('getlike', (res) => {
+                $event.appendChild(newItem(res));
+            });
+
+            socket.on('getcomment', (res) => {
+                $event.appendChild(newItem(res));
+            });
+
+            socket.on('comment')
 
             window.socket = socket;
         }
 
-        function sendMsg() {
+        function sendMsgStar() {
             const msg = $input.value;
-            console.log(msg);
-            window.socket.emit('chat', { name: 12313 });
+            window.socket.emit('setlike', { id: 0, type: 'live' });
+        }
+
+        function sendMsgComment() {
+            const msg = $input.value;
+            window.socket.emit('setcomment', { id: 0, data: 'comment' });
+        }
+
+        function sendMsgReJoin() {
+            const msg = $input.value;
+            window.socket.emit('rejoin', { id: 1 });
         }
 
         startConnect();
