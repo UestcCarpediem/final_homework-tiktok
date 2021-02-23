@@ -9,7 +9,8 @@ class VideoService extends Service {
       id: vid,
       author: 'w3.org',
       url: 'https://media.w3.org/2020/08/ml-workshop/virtual-character-web-meeting.mp4',
-      desc: 'virtual-character-web-meeting.mp4',
+      desc: 'virtual-character-web-meeting',
+      musice: 'popmusic-name',
       tags: [
         'mc', 'course',
       ],
@@ -19,8 +20,9 @@ class VideoService extends Service {
     }, {
       id: vid + 1,
       author: 'w3.org',
-      url: 'https://media.w3.org/2020/08/ml-workshop/virtual-character-web-meeting.mp4',
-      desc: 'virtual-character-web-meeting.mp4',
+      url: 'https://media.w3.org/2020/08/ml-workshop/MEYER_RAUCHENSTEIN_artie_video.mp4',
+      desc: 'MEYER_RAUCHENSTEIN_artie_video',
+      musice: 'popmusic-name',
       tags: [
         'mc', 'course',
       ],

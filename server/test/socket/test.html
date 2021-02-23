@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Socket test</title>
+</head>
+
+<body>
+    <h1>Socket.io Testing</h1>
+    <div>
+        <p>Current Room:<span id="room"></span></p>
+    </div>
+    <ul id="events"></ul>
+    <div>
+        <label>
+            room
+            <input id='inputRoom' value="0">
+        </label>
+    </div>
+    <div>
+        <label>
+            msg
+            <input id='input'>
+        </label>
+    </div>
+
+    <button id="btn" onclick="sendMsgStar()">SendLike</button>
+    <button id="btn" onclick="sendMsgComment()">SendComment</button>
+    <button id="btn" onclick="sendMsgReJoin()">SendReJoin</button>
+
+    <script src="https://cdn.jsdelivr.net/npm/socket.io-client@2/dist/socket.io.js"></script>
+    <script>
+        const $event = document.getElementById('events');
+
+        const $input = document.getElementById('input');
+        const $inputRoom = document.getElementById('inputRoom');
+        const $room = document.getElementById('room');
+        const state = { id: 0 };
+        $room.innerText = state.id;
+
+        const newItem = (content) => {
+            const item = document.createElement('li');
+            if (typeof content == 'object') {
+                item.innerHTML = JSON.stringify(content);
+            } else {
+                item.innerHTML = content;
+            }
+            return item;
+        }
+
+        function startConnect() {
+            const socket = io('ws://127.0.0.1:7001/ws?id=0');
+            // const socket = io('ws://tiktok.kingfish404.cn/ws?id=0');
+
+            socket.on('connect', () => {
+                $event.appendChild(newItem('connect'));
+                socket.send('123123');
+            });
+
+            socket.on('getrejoin', (res) => {
+                $event.appendChild(newItem(res));
+            });
+
+            socket.on('getlike', (res) => {
+                $event.appendChild(newItem(res));
+            });
+
+            socket.on('getcomment', (res) => {
+                $event.appendChild(newItem(res));
+            });
+
+            socket.on('comment')
+
+            window.socket = socket;
+        }
+
+        function sendMsgStar() {
+            const msg = $input.value;
+            window.socket.emit('setlike', { id: Number(state.id) });
+        }
+
+        function sendMsgComment() {
+            const msg = $input.value;
+            window.socket.emit('setcomment', { id: Number(state.id), data: msg, name: 'userName' });
+        }
+
+        function sendMsgReJoin() {
+            const msg = $input.value;
+            const roomId = $inputRoom.value;
+            const roomIdOld = state.id;
+            state.id = roomId;
+            $room.innerText = roomId;
+            window.socket.emit('rejoin', { id: Number(roomId), id_old: Number(roomIdOld) });
+        }
+
+        startConnect();
+    </script>
+</body>
+
+</html>
