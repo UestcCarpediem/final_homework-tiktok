@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name=viewport content="width=device-width,initial-scale=1,maximum-scale=1,minimum-scale=1,user-scalable=no,minimal-ui">
+	<meta name="referrer" content="no-referrer">
+	<title>直播</title>
+
+	<style type="text/css">
+		html, body {width:100%;height:100%;margin:auto;overflow:hidden;}
+		body {display:flex; flex-direction:column;}
+		#live {display:flex; flex-direction:column;}
+		#top {flex:auto;height:3rem;order:1;background: black;border:none;}
+		#top_close {height:100%;width:3rem;color:white;background-color: black;border:none;float:right}
+		#player {flex:auto; order:2;border:none;}
+		#comment {flex:auto; order:3;height:10rem;background: black;color:white}
+	  </style>
+</head>
+
+<body>
+	<!--页面容器-->
+	<div id="live"></div>
+	
+	<!-- 引入react核心库 -->
+	<script type="text/javascript" src="lib/react.development.js"></script>
+	<!-- 引入react-dom，用于支持react操作DOM -->
+	<script type="text/javascript" src="lib/react-dom.development.js"></script>
+	<!-- 引入babel，用于将jsx转为js -->
+	<script type="text/javascript" src="lib/babel.min.js"></script>
+	<!-- 引入西瓜视频库 -->
+	<script src="lib/xg.index.js" charset="utf-8"></script>
+    <script src="lib/xg.index.min.js" charset="utf-8"></script>
+
+
+	<script type="text/babel">
+
+	//参考：点赞的桃心特效
+	function heart(e, t, a) {
+		function r() {
+			for (var e = 0; e < s.length; e++) s[e].alpha <= 0 ? (t.body.removeChild(s[e].el), s.splice(e, 1)) : (s[e].y--, s[e].scale += .004, s[e].alpha -= .013, s[e].el.style.cssText = "left:" + s[e].x + "px;top:" + s[e].y + "px;opacity:" + s[e].alpha + ";transform:scale(" + s[e].scale + "," + s[e].scale + ") rotate(45deg);background:" + s[e].color + ";z-index:99999;position:absolute");
+			requestAnimationFrame(r)
+		}
+		function n() {
+			var t = "function" == typeof e.onclick && e.onclick;
+			e.onclick = function(e) {
+				t && t(),
+				o(e)
+			}
+		}
+		function o(e) {
+			var a = t.createElement("div");
+			a.className = "heart",
+			s.push({
+				el: a,
+				x: e.clientX - 5,
+				y: e.clientY - 5,
+				scale: 1,
+				alpha: 1,
+				color: c()
+			}),
+			t.body.appendChild(a)
+		}
+		function i(e) {
+			var a = t.createElement("style");
+			a.type = "text/css";
+			try {
+				a.appendChild(t.createTextNode(e))
+			} catch(t) {
+				a.styleSheet.cssText = e
+			}
+			t.getElementsByTagName("head")[0].appendChild(a)
+		}
+		function c() {
+			return "rgb(" + ~~ (255 * Math.random()) + "," + ~~ (255 * Math.random()) + "," + ~~ (255 * Math.random()) + ")"
+		}
+		var s = [];
+		e.requestAnimationFrame = e.requestAnimationFrame || e.webkitRequestAnimationFrame || e.mozRequestAnimationFrame || e.oRequestAnimationFrame || e.msRequestAnimationFrame ||
+		function(e) {
+			setTimeout(e, 1e3 / 60)
+		}
+
+		i(".heart{width: 10px;height: 10px;position: fixed;background: #f00;transform: rotate(45deg);-webkit-transform: rotate(45deg);-moz-transform: rotate(45deg);}.heart:after,.heart:before{content: '';width: inherit;height: inherit;background: inherit;border-radius: 50%;-webkit-border-radius: 50%;-moz-border-radius: 50%;position: fixed;}.heart:after{top: -5px;}.heart:before{left: -5px;}"),
+		n(),
+		r()
+		}
+
+
+
+		var startX = 0,startY = 0;//滑动控制相关
+		var valid = true;
+		var touchtime = new Date().getTime(); 
+		var player;	
+		var liveList;	
+		var index=0;
+
+		function Init(){
+			try{
+				console.log('init');
+				//获取播放json列表
+				var xhr = new XMLHttpRequest();
+				xhr.open('GET', 'http://tiktok.kingfish404.cn/api/live/getlist', true);
+				xhr.send();
+				
+				xhr.onreadystatechange = function () {
+					if (xhr.readyState == 4 && xhr.status == 200) {
+						var res = xhr.responseText;
+						console.log(res);
+						//res='[{"id":0,"author":"西瓜测试直播1","url":"http://sf1-hscdn-tos.pstatp.com/obj/media-fe/xgplayer_doc_video/hls/xgplayer-demo.m3u8","desc":"XGvideo1","createdAt":"2021-01-26T19:30:22.420Z","updatedAt":"2020-01-30T10:24:26.590Z","like":0,"comment":0,"share":0},{"id":1,"author":"西瓜测试直播2","url":"http://sf1-hscdn-tos.pstatp.com/obj/media-fe/xgplayer_doc_video/hls/xgplayer-demo.m3u8","desc":"XGvideo2","createdAt":"2021-01-26T19:30:22.420Z","updatedAt":"2020-01-30T10:24:26.590Z","like":0,"comment":0,"share":0},{"id":2,"author":"CCTV1","url":"http://ivi.bupt.edu.cn/hls/cctv1hd.m3u8","desc":"cctv1","createdAt":"2021-01-26T19:30:22.420Z","updatedAt":"2020-01-30T10:24:26.590Z","like":0,"comment":0,"share":0}]';
+						liveList = JSON.parse(res); 
+						//reactLoad
+						ReactDOM.render(<Live author={liveList[0].author}/>,document.getElementById('live'));
+					}
+				};
+				heart(window, document);
+			}
+			catch(e){
+				console.log(e.message)
+			}
+		}
+		Init();
+		
+
+		//滑动手势功能
+		function touchStart(evt){
+			try{
+				if(new Date().getTime() - touchtime<500){
+				console.log("dblClick");
+				}
+				else{
+					touchtime = new Date().getTime();
+				}
+				var touch = evt.touches[0], //获取第一个触点
+						x = Number(touch.pageX), //页面触点X坐标
+						y = Number(touch.pageY); //页面触点Y坐标
+				//记录触点初始位置
+				startX = x;
+				startY = y;
+			}
+			catch(e){
+				console.log(e.message)
+			}
+		}
+
+		function touchMove(evt){
+			try{
+				var touch = evt.changedTouches[0], //获取第一个触点
+						y = Number(touch.pageY); //页面触点Y坐标
+				//判断滑动方向
+				let distance=y-startY;
+				if (distance>window.innerHeight*0.2) {
+					//console.log(`下滑:${distance}`);
+					slideDown();
+				}else if(distance<-window.innerHeight*0.2){
+					//console.log(`上滑:${distance}`);
+					slideUp();
+				}
+			}
+			catch(e){
+				console.log(e.message)
+			}
+		}
+
+		function slideUp(){
+			if(!valid){
+				return false;
+			}
+			if(index<liveList.length) index++;
+			else return ;
+			valid = false
+			setTimeout(() => {
+				console.log('上滑手势');
+				ReactDOM.render(<Live author={liveList[index].author}/>,document.getElementById('live'));
+				player.src =liveList[index].url;
+				player.play();
+				valid = true;
+			}, 200)
+		}
+		function slideDown(){
+			if(!valid){
+				return false;
+			}
+			if(0<index&&index<=liveList.length) index--;
+			else return ;
+			valid = false;
+			setTimeout(() => {
+				console.log('下滑手势');
+				ReactDOM.render(<Live author={liveList[index].author}/>,document.getElementById('live'));
+				player.src =liveList[index].url;
+				player.play();
+				valid = true;
+			}, 200)
+		}
+	
+		function bindEvent(){
+			document.getElementById("player").addEventListener('touchstart',touchStart,false);
+			document.getElementById("player").addEventListener('touchmove',touchMove,false);
+		}
+		
+
+		class Live extends React.Component{
+
+			state = {};
+
+			death = ()=>{
+				//卸载组件
+				ReactDOM.unmountComponentAtNode(document.getElementById('live'))
+			}
+
+			componentDidMount(){
+					//this.setState(liveList.list[0]);
+					
+					//初始化西瓜播放器
+				    player = new HlsPlayer({
+					id: 'player',
+					url: liveList[0].url,
+					isLive: true,
+					autoplay: true,
+					playsinline: true,
+					height: window.innerHeight*0.7,
+					width: window.innerWidth,
+					controls:false,
+					closeVideoClick: true,
+					closeVideoDblclick:true,
+					closeVideoTouch:true,
+				});
+				bindEvent();
+			}
+			
+			render(){
+				const {author} = this.props;
+				return (
+				<div>
+					<div id="top" style={{color:'white' ,position:'relative'}}>
+						<p style={{color:'white', position:'absolute'}}>
+							<img src='s1.ico' />
+							&nbsp;&nbsp;{author}
+						</p>
+						<button id="top_close" onClick={this.death}>X</button>
+					</div>
+					<div id='player'>
+					</div>
+
+					<div id="comment">
+						comment:
+					</div>	
+				</div>		
+				)
+			}
+		}
+		
+
+	</script>
+</body>
+</html>
