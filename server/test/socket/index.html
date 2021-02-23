@@ -28,7 +28,8 @@
         }
 
         function startConnect() {
-            const socket = io('ws://127.0.0.1:7001/ws?token=123123');
+            // const socket = io('ws://127.0.0.1:7001/ws?token=123123');
+            const socket = io('ws://tiktok.kingfish404.cn/ws?token=123123');
 
             socket.on('connect', () => {
                 $event.appendChild(newItem('connect'));

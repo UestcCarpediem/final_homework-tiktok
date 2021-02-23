@@ -14,6 +14,7 @@ module.exports = app => {
   router.get('/api/live/getlist', controller.live.getLiveList);
 
   // websocket.io
+  io.set('origins', '*:*');
   io.of('/ws').route('rejoin', io.controller.default.rejoin);
 
   io.of('/ws').route('chat', io.controller.default.chat);

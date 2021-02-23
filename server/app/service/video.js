@@ -10,6 +10,7 @@ class VideoService extends Service {
       author: 'w3.org',
       url: 'https://media.w3.org/2020/08/ml-workshop/virtual-character-web-meeting.mp4',
       desc: 'virtual-character-web-meeting.mp4',
+      musice: 'popmusic-name',
       tags: [
         'mc', 'course',
       ],
@@ -21,6 +22,7 @@ class VideoService extends Service {
       author: 'w3.org',
       url: 'https://media.w3.org/2020/08/ml-workshop/virtual-character-web-meeting.mp4',
       desc: 'virtual-character-web-meeting.mp4',
+      musice: 'popmusic-name',
       tags: [
         'mc', 'course',
       ],
