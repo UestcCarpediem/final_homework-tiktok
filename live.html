@@ -14,6 +14,12 @@
 		#top_close {height:100%;width:3rem;color:white;background-color: black;border:none;float:right}
 		#player {flex:auto; order:2;border:none;}
 		#comment {flex:auto; order:3;height:10rem;background: black;color:white}
+		#sendMessage {height:1.3rem;width:3rem;color:white;background-color:darkgray;border:none;border-radius: 10px}
+		#commentInput {margin:0.5rem 0 0 1.8rem; border-radius:10px}
+		#commentE1{color:darkmagenta}
+		#commentE2{color:darkorange}
+		#commentE3{color:deeppink}
+		#commentE4{color:dodgerblue}
 	  </style>
 </head>
 
@@ -34,7 +40,7 @@
 
 	<script type="text/babel">
 
-	//参考：点赞的桃心特效
+	//参考div的实现方式：点赞的心型动效
 	function heart(e, t, a) {
 		function r() {
 			for (var e = 0; e < s.length; e++) s[e].alpha <= 0 ? (t.body.removeChild(s[e].el), s.splice(e, 1)) : (s[e].y--, s[e].scale += .004, s[e].alpha -= .013, s[e].el.style.cssText = "left:" + s[e].x + "px;top:" + s[e].y + "px;opacity:" + s[e].alpha + ";transform:scale(" + s[e].scale + "," + s[e].scale + ") rotate(45deg);background:" + s[e].color + ";z-index:99999;position:absolute");
@@ -85,18 +91,20 @@
 		}
 
 
-
-		var startX = 0,startY = 0;//滑动控制相关
+		//滑动控制相关
+		var startX = 0,startY = 0;
 		var valid = true;
 		var touchtime = new Date().getTime(); 
 		var player;	
 		var liveList;	
 		var index=0;
+		//评论框列表本地调测
+		var testCommentList=['大明: \xa0 hehe','二明: \xa0 支持支持','雨🐟: \xa0 哈哈哈哈哈','chouchouzhu: \xa0 不错加油 ~_~','雪碧: \xa0 666'];
 
 		function Init(){
 			try{
 				console.log('init');
-				//获取播放json列表
+				
 				var xhr = new XMLHttpRequest();
 				xhr.open('GET', 'http://tiktok.kingfish404.cn/api/live/getlist', true);
 				xhr.send();
@@ -107,8 +115,7 @@
 						console.log(res);
 						//res='[{"id":0,"author":"西瓜测试直播1","url":"http://sf1-hscdn-tos.pstatp.com/obj/media-fe/xgplayer_doc_video/hls/xgplayer-demo.m3u8","desc":"XGvideo1","createdAt":"2021-01-26T19:30:22.420Z","updatedAt":"2020-01-30T10:24:26.590Z","like":0,"comment":0,"share":0},{"id":1,"author":"西瓜测试直播2","url":"http://sf1-hscdn-tos.pstatp.com/obj/media-fe/xgplayer_doc_video/hls/xgplayer-demo.m3u8","desc":"XGvideo2","createdAt":"2021-01-26T19:30:22.420Z","updatedAt":"2020-01-30T10:24:26.590Z","like":0,"comment":0,"share":0},{"id":2,"author":"CCTV1","url":"http://ivi.bupt.edu.cn/hls/cctv1hd.m3u8","desc":"cctv1","createdAt":"2021-01-26T19:30:22.420Z","updatedAt":"2020-01-30T10:24:26.590Z","like":0,"comment":0,"share":0}]';
 						liveList = JSON.parse(res); 
-						//reactLoad
-						ReactDOM.render(<Live author={liveList[0].author}/>,document.getElementById('live'));
+						ReactDOM.render(<Live author={liveList[0].author} commentList={testCommentList}/>,document.getElementById('live'));
 					}
 				};
 				heart(window, document);
@@ -168,8 +175,9 @@
 			else return ;
 			valid = false
 			setTimeout(() => {
-				console.log('上滑手势');
-				ReactDOM.render(<Live author={liveList[index].author}/>,document.getElementById('live'));
+				let temp =[];
+				if(index==0) temp=testCommentList; //评论列表测试
+				ReactDOM.render(<Live author={liveList[index].author} commentList={temp}/>,document.getElementById('live'));
 				player.src =liveList[index].url;
 				player.play();
 				valid = true;
@@ -183,8 +191,9 @@
 			else return ;
 			valid = false;
 			setTimeout(() => {
-				console.log('下滑手势');
-				ReactDOM.render(<Live author={liveList[index].author}/>,document.getElementById('live'));
+				let temp =[];
+				if(index==0) temp=testCommentList;
+				ReactDOM.render(<Live author={liveList[index].author} commentList={temp}/>,document.getElementById('live'));
 				player.src =liveList[index].url;
 				player.play();
 				valid = true;
@@ -204,6 +213,14 @@
 			death = ()=>{
 				//卸载组件
 				ReactDOM.unmountComponentAtNode(document.getElementById('live'))
+			}
+
+			sendMessage = ()=>{
+				const {commentInput} = this.refs;
+				testCommentList.shift();
+				testCommentList.push("chouchouzhu: \xa0 "+commentInput.value);
+				commentInput.value="";
+				ReactDOM.render(<Live author={liveList[0].author} commentList={testCommentList}/>,document.getElementById('live'));
 			}
 
 			componentDidMount(){
@@ -227,7 +244,7 @@
 			}
 			
 			render(){
-				const {author} = this.props;
+				const {author,commentList} = this.props;
 				return (
 				<div>
 					<div id="top" style={{color:'white' ,position:'relative'}}>
@@ -241,7 +258,13 @@
 					</div>
 
 					<div id="comment">
-						comment:
+						<dd id="commentE1">{commentList[0]}</dd>
+						<dd id="commentE2">{commentList[1]}</dd>
+						<dd id="commentE3">{commentList[2]}</dd>
+						<dd id="commentE4">{commentList[3]}</dd>
+						<dd id="commentE5">{commentList[4]}</dd>
+						<input type="text" placeholder='说点什么吧...' ref="commentInput" id="commentInput" ></input>
+						<button id="sendMessage" onClick={this.sendMessage}>send</button>
 					</div>	
 				</div>		
 				)
