@@ -50,6 +50,9 @@ module.exports = app => {
       if (message) {
         if (message.id !== null) {
           const id = message.id;
+          const vdata = await app.mysql.get('video', { id: Number(id) });
+          vdata.comment++;
+          await app.mysql.update('video', vdata);
           const roomId = 'room-' + String(id);
           const name = message.name;
           // console.log('#comment#room:' + roomId);
