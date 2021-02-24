@@ -18,6 +18,27 @@ module.exports = appInfo => {
   // add your middleware config here
   config.middleware = [];
 
+  // mysql 配置信息
+  config.mysql = {
+    // 单数据库信息配置
+    client: {
+      // host
+      host: '127.0.0.1',
+      // 端口号
+      port: '3306',
+      // 用户名
+      user: 'test',
+      // 密码
+      password: '123456',
+      // 数据库名
+      database: 'tiktok',
+    },
+    // 是否加载到 app 上，默认开启
+    app: true,
+    // 是否加载到 agent 上，默认关闭
+    agent: false,
+  };
+
   // add your user config here
   const userConfig = {
     // myAppName: 'egg',
@@ -34,11 +55,11 @@ module.exports = appInfo => {
     namespace: {
       '/': {
         connectionMiddleware: [ 'auth' ],
-        packetMiddleware: [ ],
+        packetMiddleware: [],
       },
       '/ws': {
         connectionMiddleware: [ 'auth' ],
-        packetMiddleware: [ ],
+        packetMiddleware: [],
       },
     },
   };

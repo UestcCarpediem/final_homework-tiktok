@@ -23,11 +23,23 @@ module.exports = app => {
     }
     async like() {
       // 喜欢
-      const { ctx } = this;
+      const { ctx, app } = this;
       const message = ctx.args[0];
-      console.log('like:', message);
+      // console.log('like:', message);
       const id = message.id;
-      await ctx.socket.emit('getlike', { id: Number(id), like: 20000, get: message });
+      if (id > 100000) {
+        const vdata = await app.mysql.get('video', { id: Number(id) });
+        console.log(vdata);
+        vdata.like++;
+        await app.mysql.update('video', vdata);
+        await ctx.socket.emit('getlike', { id: Number(id), like: vdata.like, get: message });
+      } else {
+        const vdata = await app.mysql.get('video', { id: Number(id) });
+        console.log(vdata);
+        vdata.like++;
+        await app.mysql.update('video', vdata);
+        await ctx.socket.emit('getlike', { id: Number(id), like: vdata.like, get: message });
+      }
     }
     async comment() {
       // 发布评论

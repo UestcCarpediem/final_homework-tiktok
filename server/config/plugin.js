@@ -10,9 +10,14 @@ module.exports = {
     enable: true,
     package: 'egg-mysql',
   },
+  // cors
+  cors: {
+    enable: true,
+    package: 'egg-cors',
+  },
+  // socket.io
   io: {
     enable: true,
     package: 'egg-socket.io',
   },
 };
-

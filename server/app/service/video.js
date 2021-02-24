@@ -5,6 +5,9 @@ const Service = require('egg').Service;
 class VideoService extends Service {
   // 从数据库获取视频列表
   async getViderList(vid = 0) {
+    const vdbdata = await this.app.mysql.select('video');
+    // console.log('vdbdata', vdbdata);
+    // eslint-disable-next-line no-unused-vars
     const vdata = [{
       id: vid,
       author: 'w3.org',
@@ -30,9 +33,8 @@ class VideoService extends Service {
       comment: 20000,
       share: 1000,
     }];
-    return vdata;
+    return vdbdata;
   }
 }
-
 
 module.exports = VideoService;
