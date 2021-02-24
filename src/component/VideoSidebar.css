@@ -1,0 +1,23 @@
+.videoSidebar {
+  position: absolute;
+  top: 25%;
+  right: 10px;
+  color: white;
+}
+
+.videoSidebar__button {
+  padding: 20px;
+  text-align: center;
+}
+.videoSidebar__tou {
+  border-radius:50%;
+  height: 50px ;
+  width: 50px;
+  overflow:hidden;
+  margin-left: 12px;
+  /*padding: 20px;
+  text-align: center;*/
+}
+.mui-icon-image {
+  height: 50px
+}
